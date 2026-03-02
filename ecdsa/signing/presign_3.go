@@ -39,7 +39,7 @@ func (round *presign3) Start() *tss.Error {
 	round.ok[i] = true
 
 	for j, Pj := range round.Parties().IDs() {
-		common.Logger.Info(fmt.Sprintf("Round 3 parties. Party: %s ID: %d", Pj.Id, j))
+		common.Logger.Info(fmt.Sprintf("Round 3 parties. Party: %s ID: %d", Pj.Id, j), "SessionID", round.temp.sessionId.Text(16))
 	}
 
 	// Fig 7. Round 3.1 verify proofs received and decrypt alpha share of MtA output
@@ -54,7 +54,7 @@ func (round *presign3) Start() *tss.Error {
 
 		wg.Add(1)
 		go func(j int, Pj *tss.PartyID) {
-			common.Logger.Info(fmt.Sprintf("Calculating delta share alpha. Party: %s ID: %d", Pj.Id, j))
+			common.Logger.Info(fmt.Sprintf("Calculating delta share alpha. Party: %s ID: %d", Pj.Id, j), "SessionID", round.temp.sessionId.Text(16))
 			defer wg.Done()
 			DeltaD := round.temp.r2msgDeltaD[j]
 			DeltaF := round.temp.r2msgDeltaF[j]
@@ -70,7 +70,7 @@ func (round *presign3) Start() *tss.Error {
 				errChs <- round.WrapError(errors.New("failed to do mta"))
 				return
 			}
-			common.Logger.Info(fmt.Sprintf("Setting delta share alpha. %s. Party: %s ID: %d", AlphaDelta, Pj.Id, j))
+			common.Logger.Info(fmt.Sprintf("Setting delta share alpha. %s. Party: %s ID: %d", AlphaDelta, Pj.Id, j), "SessionID", round.temp.sessionId.Text(16))
 			round.temp.DeltaShareAlphas[j] = AlphaDelta
 		}(j, Pj)
 
@@ -147,7 +147,7 @@ func (round *presign3) Start() *tss.Error {
 				𝛿i,
 				round.temp.DeltaShareAlphas[j],
 				j,
-			))
+			), "SessionID", round.temp.sessionId.Text(16))
 
 		𝛿i = modN.Add(𝛿i, round.temp.DeltaShareAlphas[j])
 		𝛿i = modN.Add(𝛿i, round.temp.DeltaShareBetas[j])

@@ -8,6 +8,7 @@ package signing
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	big "github.com/binance-chain/tss-lib/common/int"
@@ -38,7 +39,7 @@ func (round *presign3) Start() *tss.Error {
 	round.ok[i] = true
 
 	for j, Pj := range round.Parties().IDs() {
-		common.Logger.Info("Round 3 parties. Party: %s ID: %d", Pj.Id, j)
+		common.Logger.Info(fmt.Sprintf("Round 3 parties. Party: %s ID: %d", Pj.Id, j))
 	}
 
 	// Fig 7. Round 3.1 verify proofs received and decrypt alpha share of MtA output
@@ -53,7 +54,7 @@ func (round *presign3) Start() *tss.Error {
 
 		wg.Add(1)
 		go func(j int, Pj *tss.PartyID) {
-			common.Logger.Info("Calculating delta share alpha. Party: %s ID: %d", Pj.Id, j)
+			common.Logger.Info(fmt.Sprintf("Calculating delta share alpha. Party: %s ID: %d", Pj.Id, j))
 			defer wg.Done()
 			DeltaD := round.temp.r2msgDeltaD[j]
 			DeltaF := round.temp.r2msgDeltaF[j]
@@ -69,7 +70,7 @@ func (round *presign3) Start() *tss.Error {
 				errChs <- round.WrapError(errors.New("failed to do mta"))
 				return
 			}
-			common.Logger.Info("Setting delta share alpha. %s. Party: %s ID: %d", AlphaDelta, Pj.Id, j)
+			common.Logger.Info(fmt.Sprintf("Setting delta share alpha. %s. Party: %s ID: %d", AlphaDelta, Pj.Id, j))
 			round.temp.DeltaShareAlphas[j] = AlphaDelta
 		}(j, Pj)
 
@@ -141,11 +142,12 @@ func (round *presign3) Start() *tss.Error {
 		}
 
 		common.Logger.Info(
-			"Multiplying delta share alpha Delta %s, DeltaShareAlpha %s. ID: %d",
-			𝛿i,
-			round.temp.DeltaShareAlphas[j],
-			j,
-		)
+			fmt.Sprintf(
+				"Multiplying delta share alpha Delta %s, DeltaShareAlpha %s. ID: %d",
+				𝛿i,
+				round.temp.DeltaShareAlphas[j],
+				j,
+			))
 
 		𝛿i = modN.Add(𝛿i, round.temp.DeltaShareAlphas[j])
 		𝛿i = modN.Add(𝛿i, round.temp.DeltaShareBetas[j])

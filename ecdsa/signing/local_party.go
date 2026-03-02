@@ -94,6 +94,7 @@ type (
 
 		// msg store
 		sessionId          *big.Int
+		sessionIdU         *big.Int
 		r1msgG             []*big.Int
 		r1msgK             []*big.Int
 		r1msg𝜓0ij          []*zkpenc.ProofEnc
@@ -203,6 +204,7 @@ func NewLocalParty(
 
 	// hash the sessionID to make sure it's of the expected length when used as a nonce
 	p.temp.sessionId = tss.ExpandSessionID(sessionId, len(p.params.EC().Params().N.Bytes()))
+	p.temp.sessionIdU = sessionId
 	return p, nil
 }
 
